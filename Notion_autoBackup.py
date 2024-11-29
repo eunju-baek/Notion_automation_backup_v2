@@ -6,11 +6,11 @@ from datetime import datetime
 
 # Notion API 설정
 headers = {
-    'Authorization': 'Bearer YOUR_NOTION_API_TOKEN',  # 여기에 실제 Notion API 토큰 입력
+    'Authorization': 'Bearer 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',  # 여기에 실제 Notion API 토큰 입력
     'Notion-Version': '2022-06-28',
 }
 
-database_id = 'YOUR_DATABASE_ID'  # 여기에 실제 데이터베이스 ID 입력
+database_id = '134d13da8dfa80a29232e955d7482ad'  # 여기에 실제 데이터베이스 ID 입력
 url = f'https://api.notion.com/v1/databases/{database_id}/query'
 
 response = requests.post(url, headers=headers)
