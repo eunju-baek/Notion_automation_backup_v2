@@ -1,0 +1,65 @@
+import requests
+import os
+import json
+import pandas as pd
+from datetime import datetime
+
+# Notion API 설정
+headers = {
+    'Authorization': 'Bearer YOUR_NOTION_API_TOKEN',  # 여기에 실제 Notion API 토큰 입력
+    'Notion-Version': '2022-06-28',
+}
+
+database_id = 'YOUR_DATABASE_ID'  # 여기에 실제 데이터베이스 ID 입력
+url = f'https://api.notion.com/v1/databases/{database_id}/query'
+
+response = requests.post(url, headers=headers)
+data = response.json()
+
+# 데이터 처리 및 파일 다운로드
+data_list = []  # CSV에 저장할 데이터 리스트
+
+# 다운로드할 파일을 저장할 디렉토리 생성
+os.makedirs('downloads', exist_ok=True)
+
+for page in data['results']:
+    page_id = page['id']
+    
+    # 페이지 이름 및 파일 정보 추출
+    name = page['properties']['Name']['title'][0]['text']['content']
+    
+    # 페이지의 각 속성 추출 (예: Tags, 완료 상태 등)
+    tags = [tag['name'] for tag in page['properties'].get('Tags', {}).get('multi_select', [])]
+    completed = page['properties'].get('완료', {}).get('checkbox', False)
+    
+    # 파일 다운로드 및 정보 저장
+    if 'Files' in page['properties']:
+        for file in page['properties']['Files']['files']:
+            file_url = file['file']['url']
+            file_name = file['name']
+            file_response = requests.get(file_url)
+            with open(os.path.join('downloads', file_name), 'wb') as f:
+                f.write(file_response.content)
+
+    # 데이터 리스트에 추가 (엑셀에 저장할 데이터)
+    data_list.append({
+        'Name': name,
+        'Tags': ', '.join(tags),  # 태그를 문자열로 변환
+        '완료': completed,
+        '파일과 미디어': ', '.join([file['name'] for file in page['properties'].get('Files', {}).get('files', [])]),
+        'Date': page['properties'].get('Date', {}).get('date', None),
+    })
+
+# 현재 날짜를 YYYYMMDD 형식으로 가져오기
+current_date = datetime.now().strftime("%Y%m%d")
+output_excel = f'{current_date}_DBbackup.xlsx'
+
+# DataFrame 생성 후 엑셀로 저장
+if data_list:  # 데이터가 있을 경우에만 엑셀로 저장
+    df = pd.DataFrame(data_list)
+    df.to_excel(output_excel, index=False)  # 엑셀 파일로 저장
+    print(f"엑셀 파일이 '{output_excel}'로 저장되었습니다.")
+else:
+    print("No valid data found to convert.")
+
+print("Backup complete.")
