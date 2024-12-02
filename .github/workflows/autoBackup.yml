@@ -28,6 +28,14 @@ jobs:
           NOTION_SPACE_ID: ${{ secrets.NOTION_SPACE_ID }}
         run: python Notion_autoBackup.py
 
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: notion-backup
+          path: |
+            *.xlsx
+            downloads/
+            
       - name: Commit and push changes
         run: |
           git config user.name github-actions
