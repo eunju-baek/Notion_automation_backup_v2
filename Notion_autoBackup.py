@@ -10,9 +10,9 @@ headers = {
     'Notion-Version': '2022-06-28',
 }
 
-database_id = '134d13da8dfa80a29232e955d7482ad'  # 여기에 실제 데이터베이스 ID 입력
+# 데이터베이스 쿼리
+database_id = '134d13da8dfa80a29232e955d7482ade'
 url = f'https://api.notion.com/v1/databases/{database_id}/query'
-
 response = requests.post(url, headers=headers)
 if response.status_code != 200:
     print(f"Error: API request failed with status code {response.status_code}")
@@ -24,6 +24,7 @@ if 'results' not in data:
     print("Error: 'results' key not found in API response")
     print(f"Response: {data}")
     exit(1)
+
     
 # 데이터 처리 및 파일 다운로드
 data_list = []  # CSV에 저장할 데이터 리스트
