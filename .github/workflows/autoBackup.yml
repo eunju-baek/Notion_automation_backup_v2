@@ -1,15 +1,15 @@
-name: Backup Notion Database
+name: Notion Auto Backup
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # 매일 자정에 실행
-  workflow_dispatch:  # 수동 실행 가능
+    - cron: "0 0 * * *"  # 매일 자정에 실행
+  workflow_dispatch:  # 수동 실행 옵션
 
 jobs:
   backup:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v2
 
       - name: Set up Python
@@ -20,92 +20,18 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests pandas openpyxl  # 필요한 패키지 설치
+          pip install requests pandas openpyxl
 
-      - name: Create backup script
-        run: |
-          echo "import requests" >> backup_script.py
-          echo "import os" >> backup_script.py
-          echo "import json" >> backup_script.py
-          echo "import pandas as pd" >> backup_script.py
-          echo "from datetime import datetime" >> backup_script.py
-          echo "" >> backup_script.py
-          echo "# Notion API 설정" >> backup_script.py
-          echo "headers = {" >> backup_script.py
-          echo "    'Authorization': 'Bearer YOUR_NOTION_API_TOKEN'," >> backup_script.py
-          echo "    'Notion-Version': '2022-06-28'," >> backup_script.py
-          echo "}" >> backup_script.py
-          echo "" >> backup_script.py
-          echo "database_id = 'YOUR_DATABASE_ID'" >> backup_script.py  # 여기에 실제 데이터베이스 ID 입력
-          echo "url = f'https://api.notion.com/v1/databases/{database_id}/query'" >> backup_script.py
-          echo "" >> backup_script.py
-          echo "response = requests.post(url, headers=headers)" >> backup_script.py
-          echo "data = response.json()" >> backup_script.py
-          echo "" >> backup_script.py
-          echo "# 데이터 처리 및 파일 다운로드" >> backup_script.py
-          echo "data_list = []" >> backup_script.py  # CSV에 저장할 데이터 리스트
-          echo "" >> backup_script.py
-          echo "# 다운로드할 파일을 저장할 디렉토리 생성" >> backup_script.py
-          echo "os.makedirs('downloads', exist_ok=True)" >> backup_script.py
-          echo "" >> backup_script.py
-
-          # 데이터 처리 루프 추가 (이 부분은 한 번에 추가하기에는 너무 길어져서 여러 줄로 나눕니다)
-          script_content = """
-for page in data['results']:
-    page_id = page['id']
-    
-    # 페이지 이름 및 파일 정보 추출
-    name = page['properties']['Name']['title'][0]['text']['content']
-    
-    # 페이지의 각 속성 추출 (예: Tags, 완료 상태 등)
-    tags = [tag['name'] for tag in page['properties'].get('Tags', {}).get('multi_select', [])]
-    completed = page['properties'].get('완료', {}).get('checkbox', False)
-    
-    # 파일 다운로드 및 정보 저장
-    if 'Files' in page['properties']:
-        for file in page['properties']['Files']['files']:
-            file_url = file['file']['url']
-            file_name = file['name']
-            file_response = requests.get(file_url)
-            with open(os.path.join('downloads', file_name), 'wb') as f:
-                f.write(file_response.content)
-
-    # 데이터 리스트에 추가 (엑셀에 저장할 데이터)
-    data_list.append({
-        'Name': name,
-        'Tags': ', '.join(tags),  # 태그를 문자열로 변환
-        '완료': completed,
-        '파일과 미디어': ', '.join([file['name'] for file in page['properties'].get('Files', {}).get('files', [])]),
-        'Date': page['properties'].get('Date', {}).get('date', None),
-    })
-
-# 현재 날짜를 YYYYMMDD 형식으로 가져오기
-current_date = datetime.now().strftime("%Y%m%d")
-output_excel = f'{current_date}_DBbackup.xlsx'
-
-# DataFrame 생성 후 엑셀로 저장
-if data_list:  # 데이터가 있을 경우에만 엑셀로 저장
-    df = pd.DataFrame(data_list)
-    df.to_excel(output_excel, index=False)  # 엑셀 파일로 저장
-    print(f"엑셀 파일이 '{output_excel}'로 저장되었습니다.")
-else:
-    print("No valid data found to convert.")
-
-print("Backup complete.")
-"""
-          
-          with open("backup_script.py", "a") as f:
-              f.write(script_content)
-
-      - name: Run backup script
-        run: python backup_script.py
+      - name: Run Notion backup script
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_SPACE_ID: ${{ secrets.NOTION_SPACE_ID }}
+        run: python Notion_autoBackup.py
 
       - name: Commit and push changes
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add downloads/* || echo "No changes to commit"
-          git commit -m "Automated backup of Notion database" || echo "Nothing to commit"
-          git push || echo "Push failed"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .
+          git commit -m "Automated Notion backup" || echo "No changes to commit"
+          git push
