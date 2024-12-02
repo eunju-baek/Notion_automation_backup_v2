@@ -43,13 +43,20 @@ for page in data['results']:
     completed = page['properties'].get('완료', {}).get('checkbox', False)
     
     # 파일 다운로드 및 정보 저장
-    if 'Files' in page['properties']:
-        for file in page['properties']['Files']['files']:
-            file_url = file['file']['url']
-            file_name = file['name']
-            file_response = requests.get(file_url)
-            with open(os.path.join('downloads', file_name), 'wb') as f:
-                f.write(file_response.content)
+if 'Files' in page['properties']:
+    print(f"Files found in page: {page['properties']['Files']}")
+    for file in page['properties']['Files']['files']:
+        file_url = file['file']['url']
+        file_name = file['name']
+        print(f"Downloading file: {file_name} from {file_url}")
+        file_response = requests.get(file_url)
+        file_path = os.path.join('downloads', file_name)
+        print(f"Saving file to: {file_path}")
+        with open(file_path, 'wb') as f:
+            f.write(file_response.content)
+        print(f"File saved: {file_path}")
+else:
+    print(f"No files found in page: {page['id']}")
 
     # 데이터 리스트에 추가 (엑셀에 저장할 데이터)
     data_list.append({
