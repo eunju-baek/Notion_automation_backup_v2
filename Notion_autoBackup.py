@@ -64,11 +64,7 @@ for page in data['results']:
                 print(f"Error downloading {file_name}: {str(e)}")
     else:
         print(f"No files found in page: {page['id']}")
-
-# 스크립트 끝에 다음 로그 추가
-print(f"Contents of downloads directory:")
-print(os.listdir(downloads_dir))
-
+  
     # 데이터 리스트에 추가 (엑셀에 저장할 데이터)
     data_list.append({
         'Name': name,
@@ -77,6 +73,12 @@ print(os.listdir(downloads_dir))
         '파일과 미디어': ', '.join([file['name'] for file in page['properties'].get('Files', {}).get('files', [])]),
         'Date': page['properties'].get('Date', {}).get('date', None),
     })
+    
+# 스크립트 끝에 다음 로그 추가
+print(f"Contents of downloads directory:")
+print(os.listdir(downloads_dir))
+
+
 
 # 현재 날짜를 YYYYMMDD 형식으로 가져오기
 current_date = datetime.now().strftime("%Y%m%d")
