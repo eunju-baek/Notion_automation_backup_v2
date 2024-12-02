@@ -36,6 +36,12 @@ downloads_dir = os.path.join(os.getcwd(), 'downloads')
 os.makedirs(downloads_dir, exist_ok=True)
 print(f"Downloads directory created at: {downloads_dir}")
 
+# .gitkeep 파일 생성
+with open(os.path.join(downloads_dir, '.gitkeep'), 'w') as f:
+    pass
+print(".gitkeep file created in downloads directory")
+
+
 for page in data['results']:
     page_id = page['id']
     
