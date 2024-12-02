@@ -18,6 +18,8 @@ if response.status_code != 200:
     print(f"Error: API request failed with status code {response.status_code}")
     print(f"Response: {response.text}")
     exit(1)
+print(f"API Response Status: {response.status_code}")
+print(f"API Response Content: {response.text[:500]}...")  # 처음 500자만 출력
 
 data = response.json()
 if 'results' not in data:
@@ -46,19 +48,26 @@ for page in data['results']:
     
     # 파일 다운로드 및 정보 저장
 if 'Files' in page['properties']:
-    print(f"Files found in page: {page['properties']['Files']}")
+    print(f"Files found in page: {page['id']}")
     for file in page['properties']['Files']['files']:
         file_url = file['file']['url']
         file_name = file['name']
-        print(f"Downloading file: {file_name} from {file_url}")
-        file_response = requests.get(file_url)
-        file_path = os.path.join('downloads', file_name)
-        print(f"Saving file to: {file_path}")
-        with open(file_path, 'wb') as f:
-            f.write(file_response.content)
-        print(f"File saved: {file_path}")
+        print(f"Attempting to download: {file_name} from {file_url}")
+        try:
+            file_response = requests.get(file_url)
+            file_response.raise_for_status()  # 오류 발생 시 예외를 발생시킵니다
+            file_path = os.path.join(downloads_dir, file_name)
+            with open(file_path, 'wb') as f:
+                f.write(file_response.content)
+            print(f"Successfully downloaded: {file_path}")
+        except Exception as e:
+            print(f"Error downloading {file_name}: {str(e)}")
 else:
     print(f"No files found in page: {page['id']}")
+
+# 스크립트 끝에 다음 로그 추가
+print(f"Contents of downloads directory:")
+print(os.listdir(downloads_dir))
 
     # 데이터 리스트에 추가 (엑셀에 저장할 데이터)
     data_list.append({
