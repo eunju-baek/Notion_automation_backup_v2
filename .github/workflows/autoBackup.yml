@@ -29,13 +29,14 @@ jobs:
         run: python Notion_autoBackup.py
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: notion-backup
           path: |
             *.xlsx
             downloads/
-            
+          include-hidden-files: true
+          
       - name: Commit and push changes
         run: |
           git config user.name github-actions
