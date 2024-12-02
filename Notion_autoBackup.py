@@ -30,8 +30,9 @@ if 'results' not in data:
 data_list = []  # CSV에 저장할 데이터 리스트
 
 # 다운로드할 파일을 저장할 디렉토리 생성
-os.makedirs('downloads', exist_ok=True)
-print(f"Downloads directory created at: {os.path.abspath('downloads')}")
+downloads_dir = os.path.join(os.getcwd(), 'downloads')
+os.makedirs(downloads_dir, exist_ok=True)
+print(f"Downloads directory created at: {downloads_dir}")
 
 for page in data['results']:
     page_id = page['id']
