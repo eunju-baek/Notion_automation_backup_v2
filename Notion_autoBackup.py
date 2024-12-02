@@ -47,23 +47,23 @@ for page in data['results']:
     completed = page['properties'].get('완료', {}).get('checkbox', False)
     
     # 파일 다운로드 및 정보 저장
-if 'Files' in page['properties']:
-    print(f"Files found in page: {page['id']}")
-    for file in page['properties']['Files']['files']:
-        file_url = file['file']['url']
-        file_name = file['name']
-        print(f"Attempting to download: {file_name} from {file_url}")
-        try:
-            file_response = requests.get(file_url)
-            file_response.raise_for_status()  # 오류 발생 시 예외를 발생시킵니다
-            file_path = os.path.join(downloads_dir, file_name)
-            with open(file_path, 'wb') as f:
-                f.write(file_response.content)
-            print(f"Successfully downloaded: {file_path}")
-        except Exception as e:
-            print(f"Error downloading {file_name}: {str(e)}")
-else:
-    print(f"No files found in page: {page['id']}")
+    if 'Files' in page['properties']:
+        print(f"Files found in page: {page['id']}")
+        for file in page['properties']['Files']['files']:
+            file_url = file['file']['url']
+            file_name = file['name']
+            print(f"Attempting to download: {file_name} from {file_url}")
+            try:
+                file_response = requests.get(file_url)
+                file_response.raise_for_status()  # 오류 발생 시 예외를 발생시킵니다
+                file_path = os.path.join(downloads_dir, file_name)
+                with open(file_path, 'wb') as f:
+                    f.write(file_response.content)
+                print(f"Successfully downloaded: {file_path}")
+            except Exception as e:
+                print(f"Error downloading {file_name}: {str(e)}")
+    else:
+        print(f"No files found in page: {page['id']}")
 
 # 스크립트 끝에 다음 로그 추가
 print(f"Contents of downloads directory:")
