@@ -11,23 +11,24 @@ headers = {
 }
 
 # 데이터베이스 쿼리
-database_id = '134d13da8dfa80a29232e955d7482ade'
+database_id = '134d13da8dfa80a29232e955d7482ade'  # 여기에 실제 데이터베이스 ID 입력
 url = f'https://api.notion.com/v1/databases/{database_id}/query'
 response = requests.post(url, headers=headers)
+
 if response.status_code != 200:
     print(f"Error: API request failed with status code {response.status_code}")
     print(f"Response: {response.text}")
     exit(1)
-print(f"API Response Status: {response.status_code}")
-print(f"API Response Content: {response.text[:500]}...")  # 처음 500자만 출력
 
+print(f"API Response Status: {response.status_code}")
 data = response.json()
+print(json.dumps(data, indent=4))  # API 응답 구조 출력
+
 if 'results' not in data:
     print("Error: 'results' key not found in API response")
     print(f"Response: {data}")
     exit(1)
 
-    
 # 데이터 처리 및 파일 다운로드
 data_list = []  # CSV에 저장할 데이터 리스트
 
@@ -40,7 +41,6 @@ print(f"Downloads directory created at: {downloads_dir}")
 with open(os.path.join(downloads_dir, '.gitkeep'), 'w') as f:
     pass
 print(".gitkeep file created in downloads directory")
-
 
 for page in data['results']:
     page_id = page['id']
@@ -70,7 +70,7 @@ for page in data['results']:
                 print(f"Error downloading {file_name}: {str(e)}")
     else:
         print(f"No files found in page: {page['id']}")
-  
+
     # 데이터 리스트에 추가 (엑셀에 저장할 데이터)
     data_list.append({
         'Name': name,
@@ -79,12 +79,10 @@ for page in data['results']:
         '파일과 미디어': ', '.join([file['name'] for file in page['properties'].get('Files', {}).get('files', [])]),
         'Date': page['properties'].get('Date', {}).get('date', None),
     })
-    
+
 # 스크립트 끝에 다음 로그 추가
 print(f"Contents of downloads directory:")
 print(os.listdir(downloads_dir))
-
-
 
 # 현재 날짜를 YYYYMMDD 형식으로 가져오기
 current_date = datetime.now().strftime("%Y%m%d")
