@@ -38,6 +38,11 @@ jobs:
           echo "Downloads directory:"
           ls -la downloads || echo "Downloads directory not found"
 
+      - name: Add downloads directory to Git
+        run: |
+          git add downloads/.gitkeep
+          git commit -m "Add downloads directory" || echo "No changes to commit"
+          git push
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
