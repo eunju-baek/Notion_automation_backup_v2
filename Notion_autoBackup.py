@@ -2,7 +2,7 @@ import requests
 import os
 import json
 import pandas as pd
-from datetime import datetime
+from datetime import date, datetime
 
 # Notion API 설정
 headers = {
