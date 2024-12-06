@@ -7,7 +7,7 @@ from datetime import date, datetime
 # Notion API 설정
 headers = {
     'Authorization': 'Bearer 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',  # 여기에 실제 Notion API 토큰 입력
-    'Notion-Version': '2022-06-28',
+    'Notion-Version': '2022-06-28'
 }
 
 # 현재 날짜 정보
