@@ -95,10 +95,11 @@ for page in data['results']:
 
     # 파일 다운로드 및 정보 저장
     file_names = []
-    if 'Files' in page['properties']:
-        print(f"Files property found in page {page_id}")
-        print(json.dumps(page['properties']['Files'], indent=2))
-        for file in page['properties']['Files']['files']:
+    if 'files' in page['properties']:
+        print(f"files property found in page {page_id}")
+        print(json.dumps(page['properties']['files'], indent=2))
+        for file in page['properties']['files']:
+        
             file_url = file.get('file', {}).get('url') or file.get('external', {}).get('url')
             file_name = file['name']
             if file_url:
