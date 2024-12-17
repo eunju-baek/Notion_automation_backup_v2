@@ -31,6 +31,7 @@ os.makedirs(downloads_dir, exist_ok=True)
 print(f"Downloads directory created at: {downloads_dir}")
 
 
+
 # 데이터베이스 쿼리 함수
 def query_database():
     url = f'https://api.notion.com/v1/databases/{database_id}/query'
@@ -41,10 +42,24 @@ def query_database():
         return None
     return response.json()
 
+# def download_file(file_url, file_name):
+#     # 다운로드 디렉토리가 없으면 생성
+#     if not os.path.exists(download_dir):
+#         os.makedirs(download_dir)
+
 def download_file(file_url, file_name):
-    # 다운로드 디렉토리가 없으면 생성
-    if not os.path.exists(download_dir):
-        os.makedirs(download_dir)
+    # 파일 경로 생성 (상대 경로 사용)
+    file_path = os.path.join(downloads_dir, file_name)
+
+    response = requests.get(file_url)
+    if response.status_code == 200:
+        with open(file_path, 'wb') as f:
+            f.write(response.content)
+        print(f"파일 다운로드 완료: {file_path}")
+    else:
+        print(f"파일 다운로드 실패: {file_name}")
+
+
     
     # 파일 경로 생성
     file_path = os.path.join(download_dir, file_name)
