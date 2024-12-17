@@ -1,0 +1,61 @@
+name: Notion Auto Backup
+
+on:
+  schedule:
+    - cron: "0 0 * * *"  # 매일 자정에 실행
+  workflow_dispatch:  # 수동 실행 옵션
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests pandas openpyxl
+
+      - name: Run Notion backup script
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_SPACE_ID: ${{ secrets.NOTION_SPACE_ID }}
+        run: |
+          echo "NOTION_TOKEN is set: ${{ secrets.NOTION_TOKEN != '' }}"
+          echo "NOTION_DATABASE_ID is set: ${{ secrets.NOTION_DATABASE_ID != '' }}"
+          python Notion_autoBackup.py
+
+      - name: List directory contents
+        run: |
+          echo "Current directory:"
+          ls -la
+          echo "Downloads directory:"
+          ls -la downloads || echo "Downloads directory not found"
+
+      - name: Add downloads directory to Git
+        run: |
+          git add downloads/.gitkeep
+          git commit -m "Add downloads directory" || echo "No changes to commit"
+          git push
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: notion-backup
+          path: |
+            *.xlsx
+            downloads/
+          include-hidden-files: true
+          
+      - name: Commit and push changes
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .
+          git commit -m "Automated Notion backup" || echo "No changes to commit"
+          git push
