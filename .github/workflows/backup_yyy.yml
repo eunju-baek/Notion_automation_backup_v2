@@ -1,4 +1,4 @@
-name: Notion Auto Backup
+name: backup_yyy
 
 on:
   schedule:
