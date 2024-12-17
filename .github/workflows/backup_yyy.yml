@@ -29,7 +29,7 @@ jobs:
         run: |
           echo "NOTION_TOKEN is set: ${{ secrets.NOTION_TOKEN != '' }}"
           echo "NOTION_DATABASE_ID is set: ${{ secrets.NOTION_DATABASE_ID != '' }}"
-          python Notion_autoBackup.py
+          python notion_backups_yyy.py
 
       - name: List directory contents
         run: |
