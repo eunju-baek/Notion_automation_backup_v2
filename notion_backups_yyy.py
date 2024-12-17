@@ -20,12 +20,12 @@ print(f"Querying data from {first_day} to {last_day}")
 
 # Notion API 설정
 headers = {
-    'Authorization': 'Bearer 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',  # 실제 Notion API 토큰 입력
+    'Authorization': 'Bearer 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',  # 실제 Notion API 토큰 입력
     'Content-Type': 'application/json',
     'Notion-Version': '2022-06-28'  # Notion API 버전
 }
 
-database_id = '15787f145dc980f996f3fa13363a865f'  # 실제 데이터베이스 ID 입력
+database_id = '134d13da8dfa80a29232e955d7482ade'  # 실제 데이터베이스 ID 입력
 downloads_dir = os.path.join(os.getcwd(), f'downloads_{current_year}_{current_month:02d}')
 os.makedirs(downloads_dir, exist_ok=True)
 print(f"Downloads directory created at: {downloads_dir}")
